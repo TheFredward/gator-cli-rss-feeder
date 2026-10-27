@@ -2,11 +2,12 @@ package fileFunctions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 )
 
-const fileName = "/gatorconfig.json"
+const fileName = "/.gatorconfig.json"
 
 func Read(cfg *Config) error {
 	var dataBytes []byte
@@ -23,7 +24,6 @@ func Read(cfg *Config) error {
 	if err = json.Unmarshal(dataBytes, cfg); err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", cfg) // prints: &{X:1 Y:2}
 	return nil
 }
 func Write(cfg *Config) error {
@@ -38,5 +38,8 @@ func Write(cfg *Config) error {
 		fmt.Print("Error: ", err)
 	}
 	err = os.WriteFile(fullPath, byteVal, 0644)
+	if err != nil {
+		return errors.New("Unable to update username")
+	}
 	return nil
 }
