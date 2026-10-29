@@ -3,11 +3,11 @@ package main
 import (
 	"errors"
 
-	"github.com/TheFredward/gator-cli-rss-feeder/internal/config/fileFunctions"
+	"github.com/TheFredward/gator-cli-rss-feeder/internal/config"
 )
 
 type state struct {
-	cfg *fileFunctions.Config
+	cfg *config.Config
 }
 
 type command struct {

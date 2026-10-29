@@ -1,4 +1,4 @@
-package fileFunctions
+package config
 
 import (
 	"encoding/json"
@@ -13,7 +13,6 @@ func Read(cfg *Config) error {
 	var dataBytes []byte
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println("Error: ", err)
 		return err
 	}
 	fullPath := homeDir + fileName

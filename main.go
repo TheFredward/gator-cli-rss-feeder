@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/TheFredward/gator-cli-rss-feeder/internal/config/fileFunctions"
+	"github.com/TheFredward/gator-cli-rss-feeder/internal/config"
 )
 
 func main() {
-	cfg := &fileFunctions.Config{}
-	err := fileFunctions.Read(cfg)
+	cfg := &config.Config{}
+	err := config.Read(cfg)
 	if err != nil {
-		fmt.Printf("%v", err)
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
 		return
 	}
 	cfgState := &state{cfg: cfg}
