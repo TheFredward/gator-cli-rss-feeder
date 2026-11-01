@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 
 	"github.com/TheFredward/gator-cli-rss-feeder/internal/config"
+	"github.com/TheFredward/gator-cli-rss-feeder/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -16,11 +19,18 @@ func main() {
 		os.Exit(1)
 		return
 	}
-	cfgState := &state{cfg: cfg}
+	var db *sql.DB
+	db, err = sql.Open("postgres", cfg.Db_url)
+	if err != nil {
+		fmt.Print(err)
+	}
+	dbQueries := database.New(db)
+	cfgState := &state{cfg: cfg, db: dbQueries}
 	cmds := commands{
 		AllCmds: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 	userArgs := os.Args
 	if len(userArgs) < 2 {
 		fmt.Printf("%v\n", errors.New("Incorrect number of arguments! require 2"))
