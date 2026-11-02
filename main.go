@@ -31,6 +31,8 @@ func main() {
 	}
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", reset)
+	cmds.register("users", handlerGetUsers)
 	userArgs := os.Args
 	if len(userArgs) < 2 {
 		fmt.Printf("%v\n", errors.New("Incorrect number of arguments! require 2"))
@@ -46,7 +48,6 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Printf("Login successful. %s logged in\n", userArgs[2:])
 	os.Exit(0)
 
 }

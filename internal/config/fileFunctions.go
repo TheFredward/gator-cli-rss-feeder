@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 )
 
@@ -34,7 +33,7 @@ func Write(cfg *Config) error {
 	fullPath := homeDir + fileName
 	byteVal, err = json.Marshal(cfg)
 	if err != nil {
-		fmt.Print("Error: ", err)
+		return err
 	}
 	err = os.WriteFile(fullPath, byteVal, 0644)
 	if err != nil {

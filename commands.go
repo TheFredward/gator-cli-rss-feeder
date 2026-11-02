@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/TheFredward/gator-cli-rss-feeder/internal/config"
@@ -35,10 +34,10 @@ func handlerLogin(s *state, cmd command) error {
 	var checkUser database.User
 	checkUser, err := s.db.GetUser(context.Background(), sql.NullString{String: userName, Valid: true})
 	if err != nil {
-		fmt.Println("User does not exist!")
-		os.Exit(1)
+		return errors.New("User not found!")
 	}
 	s.cfg.SetUser(checkUser.Name.String)
+	fmt.Printf("Login successful. %s logged in\n", userName)
 	return nil
 }
 
@@ -53,20 +52,39 @@ func handlerRegister(s *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name:      sql.NullString{String: userName, Valid: true},
 	}
-	createdUser, err := s.db.CreateUser(context.Background(), newUser)
+	_, err := s.db.CreateUser(context.Background(), newUser)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	    return err
 	}
-	var foundUser database.User
-	foundUser, err = s.db.GetUser(context.Background(), createdUser.Name)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Print(foundUser)
 	s.cfg.SetUser(userName)
 	return nil
 
+}
+
+func handlerGetUsers(s *state, cmd command) error {
+	listUsers, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return err
+	}
+	if len(listUsers) == 0 {
+		return errors.New("No users have been added yet!")
+	}
+	for _, user := range listUsers {
+		if s.cfg.Curr_usr == user.String {
+			fmt.Printf("%s (current)\n", user.String)
+		} else {
+		    fmt.Println(user.String)
+		}
+	}
+	return nil
+}
+
+func reset(s *state, cmd command) error {
+	err := s.db.DeleteUsers(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *commands) run(s *state, cmd command) error {
