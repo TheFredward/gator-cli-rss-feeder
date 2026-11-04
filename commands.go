@@ -54,7 +54,7 @@ func handlerRegister(s *state, cmd command) error {
 	}
 	_, err := s.db.CreateUser(context.Background(), newUser)
 	if err != nil {
-	    return err
+		return err
 	}
 	s.cfg.SetUser(userName)
 	return nil
@@ -73,9 +73,18 @@ func handlerGetUsers(s *state, cmd command) error {
 		if s.cfg.Curr_usr == user.String {
 			fmt.Printf("%s (current)\n", user.String)
 		} else {
-		    fmt.Println(user.String)
+			fmt.Println(user.String)
 		}
 	}
+	return nil
+}
+
+func handlerFetchFeed(s *state, cmd command) error {
+	data, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v", data)
 	return nil
 }
 
