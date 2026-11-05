@@ -26,15 +26,21 @@ type commands struct {
 	AllCmds map[string]func(*state, command) error
 }
 
+func getUser(s *state, name string) (database.User, error) {
+	user, err := s.db.GetUser(context.Background(), sql.NullString{String: name, Valid: true})
+	if err != nil {
+		return database.User{}, errors.New("User not found!")
+	}
+	return user, nil
+}
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.arguments) == 0 {
 		return errors.New("Username is required to login")
 	}
 	userName := cmd.arguments[0]
-	var checkUser database.User
-	checkUser, err := s.db.GetUser(context.Background(), sql.NullString{String: userName, Valid: true})
+	checkUser, err := getUser(s, userName)
 	if err != nil {
-		return errors.New("User not found!")
+		return err
 	}
 	s.cfg.SetUser(checkUser.Name.String)
 	fmt.Printf("Login successful. %s logged in\n", userName)
@@ -85,6 +91,32 @@ func handlerFetchFeed(s *state, cmd command) error {
 		return err
 	}
 	fmt.Printf("%+v", data)
+	return nil
+}
+
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.arguments) <= 1 {
+		return errors.New("Require Title and link")
+	}
+	foundUser, err := getUser(s, s.cfg.Curr_usr)
+	if err != nil {
+		return err
+	}
+	name := cmd.arguments[0]
+	url := cmd.arguments[1]
+	newFeed := database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      sql.NullString{String: name, Valid: true},
+		Url:       sql.NullString{String: url, Valid: true},
+		UserID:    uuid.NullUUID{UUID: foundUser.ID, Valid: true},
+	}
+	feed, err := s.db.CreateFeed(context.Background(), newFeed)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v", feed)
 	return nil
 }
 

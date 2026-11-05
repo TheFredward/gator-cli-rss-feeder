@@ -34,6 +34,7 @@ func main() {
 	cmds.register("reset", reset)
 	cmds.register("users", handlerGetUsers)
 	cmds.register("agg", handlerFetchFeed)
+	cmds.register("addfeed", handlerAddFeed)
 	userArgs := os.Args
 	if len(userArgs) < 2 {
 		fmt.Printf("%v\n", errors.New("Incorrect number of arguments! require 2"))
