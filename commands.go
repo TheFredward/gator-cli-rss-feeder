@@ -120,6 +120,23 @@ func handlerAddFeed(s *state, cmd command) error {
 	return nil
 }
 
+func handlerGetFeed(s *state, cmd command) error {
+	data, err := s.db.GetFeed(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, feedVal := range data {
+		user, err := s.db.GetUserUuid(context.Background(), feedVal.UserID.UUID)
+		if err != nil {
+			return err
+		} else {
+			fmt.Printf("Name: %s\nURL: %s\nUser: %s\n", feedVal.Name.String, feedVal.Url.String, user.Name.String)
+		}
+
+	}
+	return nil
+}
+
 func reset(s *state, cmd command) error {
 	err := s.db.DeleteUsers(context.Background())
 	if err != nil {
